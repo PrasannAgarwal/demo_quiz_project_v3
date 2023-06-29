@@ -3,6 +3,7 @@ import yaml
 import json
 from services.validator.validationServiceImpl import ValidationServiceImpl
 from services.question.questionServiceImpl import QuestionServiceImpl
+from services.responseValidator.responseValidatorServiceImpl import ResponseValidatorServiceImpl
 from flask_restful import Resource, reqparse
 
 
@@ -37,6 +38,7 @@ class QuestionController(Resource):
 
         self.validationService = ValidationServiceImpl()
         self.questionService = QuestionServiceImpl()
+        self.responseValidatorService = ResponseValidatorServiceImpl()
 
     def post(self):
         data = self.parser.parse_args()
@@ -45,10 +47,12 @@ class QuestionController(Resource):
         print("\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/")
         self.validationService.validate(data=data)
         response_correct = False
-        while not response_correct:
+        count = 0
+        while not response_correct and count<5:
             response_body = self.questionService.generate_question(topic=data['topic'], difficulty=data['difficulty_level'], question_type=data['question_type'])
 
-            response_correct = True
+            response_correct = self.responseValidatorService.validateResponse(response_body=response_body)
+            count -= 1
         return response_body
 
 
