@@ -10,7 +10,7 @@ with open("config.yaml", "r") as stream:
     try:
         # print(yaml.safe_load(stream))
         openai.api_key = yaml.safe_load(stream)['API_KEY']
-        print(openai.api_key)
+        # print(openai.api_key)
     except yaml.YAMLError as exc:
         print(exc)
 
@@ -42,7 +42,7 @@ class QuestionController(Resource):
         data = self.parser.parse_args()
         print("DATA in question controller")
         print(data)
-        print("\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/")
+        print("\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/")
         self.validationService.validate(data=data)
         response_correct = False
         while not response_correct:
