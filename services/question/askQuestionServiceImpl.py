@@ -12,6 +12,7 @@ class AskQuestionServiceImpl(AskQuestionService):
         )
         response = completion.choices[0].message["content"]
         print(response)
-        response_json = json.loads(response)
-        return response_json
+        return response
+        # response_json = json.loads(response)
+        # return response_json
         # return super().ask_question(question)

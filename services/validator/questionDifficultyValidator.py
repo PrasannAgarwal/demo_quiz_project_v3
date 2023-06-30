@@ -14,4 +14,3 @@ class QuestionDifficultyValidator(Validator):
         QuestionDifficultySet = [questionDifficulty.value for questionDifficulty in QuestionDifficulties]
         if difficulty_level not in QuestionDifficultySet:
             raise ValueError(f"difficulty_level can only be one of the following types: {'; '.join(QuestionDifficultySet)}")
-        #to_implement

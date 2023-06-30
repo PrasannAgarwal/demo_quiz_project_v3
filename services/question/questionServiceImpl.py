@@ -7,7 +7,7 @@ class QuestionServiceImpl(QuestionService):
         self.createPromptService = CreatePromptServiceImpl()
         self.askQuestionServiceImpl = AskQuestionServiceImpl()
 
-    def generate_question(self, topic, difficulty, question_type):
+    def generate_question(self, topic, difficulty, question_type, num_questions):
         # question = f"generate a {question_type} type question and answer on {topic} with "
         # if question_type == 'MCQ' or question_type == 'multiple correct answers':
         #     print(question_type)
@@ -15,7 +15,7 @@ class QuestionServiceImpl(QuestionService):
         # question = question + f"difficulty level {difficulty}."
         # question = question + "Present answer in JSON format as follows: {question: question phrase, choices: list of choices, answer: list of answers} leave list of choices empty if no choices are asked in the question."
 
-        question = self.createPromptService.create_prompt(topic=topic, difficulty=difficulty, question_type=question_type)
+        question = self.createPromptService.create_prompt(topic=topic, difficulty=difficulty, question_type=question_type, num_questions=num_questions)
         print(question)
         # completion = openai.ChatCompletion.create(
         #     model="gpt-3.5-turbo",
@@ -26,5 +26,5 @@ class QuestionServiceImpl(QuestionService):
         # response = completion.choices[0].message["content"]
         # print(response)
         # response_json = json.loads(response)
-        response_json = self.askQuestionServiceImpl.ask_question(question=question)
-        return response_json
+        gpt_response = self.askQuestionServiceImpl.ask_question(question=question)
+        return gpt_response

@@ -4,6 +4,7 @@ import json
 from services.validator.validationServiceImpl import ValidationServiceImpl
 from services.question.questionServiceImpl import QuestionServiceImpl
 from services.responseValidator.responseValidatorServiceImpl import ResponseValidatorServiceImpl
+from services.responseConvertor.responseJsonConvertorImpl import ResponseJsonConvertorImpl
 from flask_restful import Resource, reqparse
 
 
@@ -39,21 +40,38 @@ class QuestionController(Resource):
         self.validationService = ValidationServiceImpl()
         self.questionService = QuestionServiceImpl()
         self.responseValidatorService = ResponseValidatorServiceImpl()
+        self.responseJsonConvertorService = ResponseJsonConvertorImpl()
 
     def post(self):
-        data = self.parser.parse_args()
         print("DATA in question controller")
-        print(data)
-        print("\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/")
-        self.validationService.validate(data=data)
-        response_correct = False
-        count = 0
-        while not response_correct and count<5:
-            response_body = self.questionService.generate_question(topic=data['topic'], difficulty=data['difficulty_level'], question_type=data['question_type'])
-
-            response_correct = self.responseValidatorService.validateResponse(response_body=response_body)
-            count -= 1
-        return response_body
+        # print("\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/")
+        try:
+            data = self.parser.parse_args()
+            print(data)
+            self.validationService.validate(data=data)
+        except Exception as e:
+            return {"message": "Invalid payload"}, 400
+        try:
+            response_correct = False
+            count = 0
+            num_questions = 1
+            num_retries = 5
+            while not response_correct and count < num_retries:
+                response_body = self.questionService.generate_question(topic=data['topic'], difficulty=data['difficulty_level'], question_type=data['question_type'], num_questions=num_questions)
+                try:
+                    response_json = self.responseJsonConvertorService.resp_json_convertor(responseBody=response_body)
+                    self.responseValidatorService.validateResponse(response_json=response_json, question_type = data['question_type'], num_questions=num_questions)
+                    response_correct = True
+                    count +=1
+                except Exception as e:
+                    print(e)
+                    response_correct = False
+                    count += 1
+            if not response_correct:
+                return {"message": "Unable to fulfill request"}, 500
+            return response_json, 200
+        except Exception as e:
+            return {"message": "Unable to fulfill request"}, 500
 
 
     # @staticmethod

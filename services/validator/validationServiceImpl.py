@@ -22,4 +22,4 @@ class ValidationServiceImpl(ValidationService):
                 print(validator)
                 validator.validate(data)
         except Exception as e:
-            raise ValueError(e)
+            raise e
